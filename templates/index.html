@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+    <!-- PLOTLY.JS CDN LINK-->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+      
+    <title>Belly Button Diversity</title>
+  </head>
+  <body>
+    <div class = "jumbotron jumbotron-fluid">
+        <div class = "container">
+        <h1 class = "display-4 text-center">Belly Button Biodiversity</h1>
+        <h1 class = "display-4 text-center">Dashboard</h1>
+        <p class = "text-center">Use the interactive charts below to explore the dataset.</p>
+        </div>
+    </div>
+    <div class = "container">
+        <div class = "row">
+            <div class = "col-lg-2 col-md-2">
+                <div class = "row">
+                    <div class = "card p-3 mb-1">
+                        <h5> SELECT Sample: </h5>
+                        <select id="selDataset" onchange="optionChanged(this.value)">
+                            {% for sample in samples %}
+                            <option value = "{{sample}}">{{sample}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class = "row">
+                   <div class = "card p-3 mt-1" >
+                       <h5 class = 'card-title'>Sample Metadata</h5>
+                       <div id="metaData" class = 'card-body'>
+                       </div>
+                       
+                    </div>
+                </div>
+            </div>
+            <div class = "col-lg-6 col-md-6">
+                <p>this is where pie chart is</p>
+                <div id = "/samples/<sample>"></div>
+                <script>
+                    Plotly.d3.json('/samples/<sample>', function(error,data){
+                        if (error) return cosole.warn(error);
+                        var layour = {margin:{t:0}}
+                        var LINE = document.getElementById('/samples/<sample>');
+                        Plotly.plot(pie, data)
+                    })
+                </script>
+            </div>
+            <div class = "col-lg-4 col-md-4">
+                <p>this is where wash frequency graph resides</p>
+            </div> 
+
+        </div>
+        
+        
+    </div>
+      
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+      
+      <script>
+      function optionChanged(sample){
+          query_sample = int(sample[3:]);
+          sample_meta = {};
+          for metadata in session.query(Metadata).filter(Metadata.SAMPLEID==query_sample).all():
+            sample_meta = (metadata.__dict__)
+          if(len(sample_meta) == 0):
+            metadata = f'Sample Metadata not available for {sample}'
+            else :
+                sample_keys = ["AGE", "BBTYPE", "ETHNICITY", "GENDER", "LOCATION", "SAMPLEID"]
+                metadata = {key:sample_meta[key] for key in sample_keys}
+      }
+      </script>
+  </body>
+</html>
